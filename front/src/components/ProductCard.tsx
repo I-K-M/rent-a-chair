@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-export default function ProductCart(props) {
+export default function ProductCart(props: { name: string; image: string; description: string; price: string }) {
     return (
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="relative h-64">

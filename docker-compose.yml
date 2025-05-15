@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  payload:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: payload_cms
+    environment:
+      - PAYLOAD_SECRET=supersecretvalue
+      - DATABASE_URI=postgres://postgres:postgres@postgres:5432/rent_a_chair
+      - PAYLOAD_CONFIG_PATH=/app/payload.config.ts
+    ports:
+      - "3001:3000"
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: ["npm", "run", "dev"]
+
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=rent_a_chair
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  adminer:
+    image: adminer
+    container_name: adminer_db
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:

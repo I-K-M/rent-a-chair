@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { Fragment } from 'react';
 
-export default function Layout({ children }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <Fragment>
       <Head>

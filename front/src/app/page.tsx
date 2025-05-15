@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import ProductCard from '../components/ProductCard.jsx'
-import Testimonial from '../components/Testimonial.jsx'
+import ProductCard from '../components/ProductCard'
+import Testimonial from '../components/Testimonial'
 export default function Home() {
   return (
     <div className="min-h-screen">
@@ -43,9 +43,9 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-center mb-12">Featured Products</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Featured Product Cards */}
-            <ProductCard name="Classic Office Chair" image="/images/2.png" price="$25/day" />
-            <ProductCard name="Modern Meeting Chair" image="/images/5.png" price="$15/day" />
-            <ProductCard name="Modern Comfort Chair" image="/images/3.png" price="$45/day" />
+            <ProductCard name="Classic Office Chair" image="/images/2.png" description="Incredible comfort and style in one chair" price="$25/day" />
+            <ProductCard name="Modern Meeting Chair" image="/images/5.png" description="Incredible comfort and style in one chair" price="$15/day" />
+            <ProductCard name="Modern Comfort Chair" image="/images/3.png" description="Incredible comfort and style in one chair" price="$45/day" />
 
           </div>
         </div>
