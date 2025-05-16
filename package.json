@@ -5,8 +5,11 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "docker-compose up -d && cd apps/web && npm run dev",
-    "build": "docker-compose build",
-    "down": "docker-compose down"
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "turbo": "latest"
   }
 }

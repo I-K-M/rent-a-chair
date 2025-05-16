@@ -1,53 +1,59 @@
 version: "3.8"
 
 services:
-  postgres:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: rentachair
+  web:
+    build: 
+      context: ./apps/web
+      dockerfile: Dockerfile
     ports:
-      - "5433:5432"  # Changed from 5432:5432
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://commerce:9000
+      - NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
-  medusa:
+  commerce:
     build:
       context: ./apps/commerce
       dockerfile: Dockerfile
-    environment:
-      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@postgres:5432/rentachair
-      NODE_ENV: development
-      PORT: 9000
-      DATABASE_TYPE: postgres
     ports:
       - "9000:9000"
-    depends_on:
-      - postgres
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/rent-a-chair
+      - REDIS_URL=redis://redis:6379
 
-  payload:
+  cms:
     build:
       context: ./apps/cms
       dockerfile: Dockerfile
-    environment:
-      DATABASE_URI: postgres://${DB_USER}:${DB_PASSWORD}@postgres:5432/rentachair
-      PAYLOAD_SECRET: your-secret-key
-      PORT: 3001
     ports:
       - "3001:3001"
-    depends_on:
-      - postgres
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/rent-a-chair
+      - PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3001
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: rent-a-chair
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
 
 volumes:
   postgres_data:
+  mongodb_data:

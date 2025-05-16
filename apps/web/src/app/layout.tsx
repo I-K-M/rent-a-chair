@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+'use client'
+
 import { Inter, Inter as InterMono } from "next/font/google";
 import "./globals.css";
 import Layout from '../components/Layout';
@@ -13,23 +14,27 @@ const interMono = InterMono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Rent A Chair",
-  description: "Rent A Chair E-commerce",
-};
+import { useEffect } from 'react'
+import { useCartStore } from "@/lib/store/cart-store"
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
+  const initCart = useCartStore((state) => state.initCart)
+
+  useEffect(() => {
+    initCart()
+  }, [initCart])
+
   return (
     <html lang="en">
-      <body
-        className={`${inter.variable} ${interMono.variable} antialiased`}
-      >
-        <Layout>{children}</Layout>
+      <body>
+        <Layout>
+          {children}
+        </Layout>
       </body>
     </html>
-  );
+  )
 }

@@ -1,26 +1,38 @@
 /dist
 .env
+.env.*
+!.env.example
 .DS_Store
-/uploads
+/uploads/*
+!uploads/.gitkeep
 /node_modules
 yarn-error.log
+npm-debug.log*
 
+# IDE
 .idea
+.vscode
+*.swp
+*.swo
 
+# Testing
 coverage
 
-!src/**
-
-./tsconfig.tsbuildinfo
-medusa-db.sql
+# Build
 build
 .cache
+.medusa
+medusa-db.sql
+*.tsbuildinfo
 
+# Yarn
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+.pnp.*
 
-.medusa
+# Docker
+docker-compose.override.yml
