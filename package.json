@@ -1,29 +1,12 @@
 {
   "name": "rent-a-chair",
-  "version": "1.0.0",
-  "description": "E-commerce website with Payload CMS",
-  "main": "payload/dist/index.js",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
-    "build": "tsc",
-    "dev": "npm run build && node payload/dist/index.js",
-    "start": "node payload/dist/index.js"
-  },
-  "dependencies": {
-    "@headlessui/react": "^2.2.2",
-    "@heroicons/react": "^2.2.0",
-    "@payloadcms/db-postgres": "^3.37.0",
-    "express": "^4.18.2",
-    "payload": "^3.37.0",
-    "pg": "^8.16.0"
-  },
-  "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/node": "^20.17.47",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "next": "^14.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "typescript": "^5.0.0"
+    "dev": "docker-compose up -d && cd apps/web && npm run dev",
+    "build": "docker-compose build",
+    "down": "docker-compose down"
   }
 }
