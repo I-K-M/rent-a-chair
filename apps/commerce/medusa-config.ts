@@ -9,8 +9,8 @@ module.exports = defineConfig({
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
       authCors: process.env.AUTH_CORS!,
-      jwtSecret: process.env.JWT_SECRET || "supersecret",
-      cookieSecret: process.env.COOKIE_SECRET || "supersecret",
+      jwtSecret: process.env.JWT_SECRET || (() => { throw new Error('JWT_SECRET required') })(),
+      cookieSecret: process.env.COOKIE_SECRET || (() => { throw new Error('COOKIE_SECRET required') })(),
     }
   }
 })

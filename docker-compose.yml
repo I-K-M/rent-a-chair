@@ -1,59 +1,84 @@
-version: "3.8"
-
 services:
   web:
-    build: 
+    build:
       context: ./apps/web
-      dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - '127.0.0.1:3000:3000'
     environment:
-      - NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://commerce:9000
-      - NEXT_PUBLIC_SITE_URL=http://localhost:3000
-
+      NEXT_PUBLIC_MEDUSA_BACKEND_URL: http://localhost:9000
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    depends_on:
+      - commerce
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 200
   commerce:
     build:
       context: ./apps/commerce
-      dockerfile: Dockerfile
     ports:
-      - "9000:9000"
+      - '127.0.0.1:9000:9000'
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/rent-a-chair
-      - REDIS_URL=redis://redis:6379
-
+      DATABASE_URL: postgres://${POSTGRES_USER:-rac_app}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/${POSTGRES_DB:-rent_a_chair}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      COOKIE_SECRET: ${COOKIE_SECRET:?Set COOKIE_SECRET in .env}
+      STORE_CORS: http://localhost:3000
+      ADMIN_CORS: http://localhost:9000
+      AUTH_CORS: http://localhost:3000,http://localhost:9000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 200
   cms:
     build:
       context: ./apps/cms
-      dockerfile: Dockerfile
     ports:
-      - "3001:3001"
+      - '127.0.0.1:3001:3000'
     environment:
-      - MONGODB_URI=mongodb://mongodb:27017/rent-a-chair
-      - PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3001
-
+      DATABASE_URI: postgres://${POSTGRES_USER:-rac_app}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/${POSTGRES_DB:-rent_a_chair}
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET:?Set PAYLOAD_SECRET in .env}
+      PAYLOAD_PUBLIC_SERVER_URL: http://localhost:3001
+    depends_on:
+      postgres:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 200
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: rent-a-chair
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: ${POSTGRES_DB:-rent_a_chair}
+      POSTGRES_USER: ${POSTGRES_USER:-rac_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
-  mongodb:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 200
   redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
-
+    image: redis:7-alpine
+    command: ['redis-server', '--save', '', '--appendonly', 'no', '--protected-mode', 'yes']
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 100
 volumes:
   postgres_data:
-  mongodb_data:
